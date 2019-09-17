@@ -105,6 +105,59 @@ app.delete('/api/v1/todos/:id',(req,res)=>{
 
 
 //========================================================================
+//==================================PUT method to update the existing results===========
+
+app.put('/api/v1/todos/',(req,res)=>{
+  const id = parseInt(req.params.id, 10);
+  let todoFound;
+  let itemIndex;
+  db.map((todo, index) => {
+    if (todo.id === id) {
+      todoFound = todo;
+      itemIndex = index;
+    }
+  });
+
+  if (!todoFound) {
+    return res.status(404).send({
+      success: 'false',
+      message: 'todo not found',
+    });
+  }
+
+	if (!req.params.title) {
+		res.status(400).send({
+			success:'false',
+			description:'please send the title'
+		})
+	}
+	else if (!req.params.description) {
+		res.status(400).send({
+			success:'false',
+			description:'please send the description'
+		})
+	}
+	
+	const updatedTodo={
+		id:todoFound.id,
+		title:req.body.title || todoFound.title,
+		description:req.body.description || todoFound.description
+	};
+	db.splice(itemIndex, 1, updatedTodo);
+	return res.status(201).send({
+    success: 'true',
+    message: 'todo added successfully',
+    updatedTodo,
+  });
+});
+
+
+
+
+
+//======================================================================================
+
+
 app.get('/',(req,res)=>{
 	res.status(200).send({
 		message:"this is success endpoint beginner"
